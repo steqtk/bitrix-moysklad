@@ -1,5 +1,6 @@
 <?php
-
+$username = 'user@name';
+$password = 'password';
 $url = 'https://online.moysklad.ru/api/remap/1.1/entity/webhook/';
 $ch = curl_init();
 $param = [
