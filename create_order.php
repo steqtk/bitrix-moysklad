@@ -37,7 +37,7 @@ $positions = getData($order['positions']['meta']['href']);
 $products = [];
 foreach ($positions['rows'] as $p) {
 
-    // цена с 2-мя лишними нулями, без разделителя копеек, может быть это глюк МС и они его потом поправят.
+    // цена с 2-мя лишними нулями, без разделителя копеек, в настройках api МойСклад можно задать нужный формат
     array_push($products, ['name' => getData($p['assortment']['meta']['href'])['name'], 'quantity' => $p['quantity'], 'price' => $p['price'] / 100]);
 
 }
@@ -46,8 +46,6 @@ foreach ($positions['rows'] as $p) {
  * обновляем заказ в битриксе
  */
 if (($action == 'UPDATE' && $type == 'customerorder') || ($action == 'UPDATE' && $type == 'retaildemand')) {
-
-    if ($order['name'] !== 'bx-6130') die;
 
     $payment_method = getData($order['state']['meta']['href']);
 toLog('payment',[$payment_method]);
@@ -81,11 +79,10 @@ toLog('payment',[$payment_method]);
     $product_compare = array_diff_assoc($products, $bx_products);
     if (count($product_compare) > 0) {
 // изменился состав или кол-во в заказе в мс
-
 // соберем массив id товаров из битрикса и кол-во из мс
         foreach ($products as $name => $quantity) {
             $arSelect = ['ID'];
-            $arFilter = ['IBLOCK_ID' => 4, 'NAME' => $name, 'ACTIVE' => 'Y'];
+            $arFilter = ['IBLOCK_ID' => 4, 'NAME' => $name, 'ACTIVE' => 'Y']; 
             $res = CIBlockElement::GetList([], $arFilter, false, [], $arSelect);
             if ($ob = $res->GetNextElement()) {
 
@@ -123,14 +120,11 @@ toLog('payment',[$payment_method]);
     }
 
 //    поставим метод оплаты заказа
-
-
 // ставим признак совершенного обмена, чтобы исключить дублирование в МС
     $order = Sale\Order::load($bx_id);
     $order->setField('UPDATED_1C','Y');
     $order->save();
-
-    toLog('update-order', ['name' => $order['name'], 'products' => $products]);
+toLog('update-order', ['name' => $order['name'], 'products' => $products]);
 }
 
 /**
@@ -160,10 +154,8 @@ if (($action == 'CREATE' && $type == 'customerorder') || ($action == 'CREATE' &&
 // т.к. МС не группирует одинаковые товары, поэтому делаем в цикле
     $products = [];
     foreach ($positions['rows'] as $p) {
-
-        // цена с 2-мя лишними нулями, без разделителя копеек, может быть это глюк МС и они его потом поправят.
+        // цена с 2-мя лишними нулями, без разделителя копеек, в настройках api МойСклад можно задать нужный формат
         array_push($products, ['name' => getData($p['assortment']['meta']['href'])['name'], 'quantity' => $p['quantity'], 'price' => $p['price'] / 100]);
-
     }
 
     $basket = Bitrix\Sale\Basket::create("s1");
