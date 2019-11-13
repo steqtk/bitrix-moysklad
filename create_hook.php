@@ -4,7 +4,7 @@ $password = 'password';
 $url = 'https://online.moysklad.ru/api/remap/1.1/entity/webhook/';
 $ch = curl_init();
 $param = [
-    'url' => 'https://example.com/moysklad/create_order.php',
+    'url' => 'https://example.com/moysklad/create_order.php', // расположение файла create_order.php на сайте с битриксом
     'action' => 'UPDATE', // и 'action' => 'CREATE'
     'entityType' => 'retaildemand' // или 'entityType' => 'customerorder'
 ];
